@@ -10,7 +10,7 @@ public class ThreadPool {
      */
     private static final ExecutorService EXECUTOR_SERVICE =
             new ThreadPoolExecutor(5, 8, 20, TimeUnit.SECONDS,
-                    new ArrayBlockingQueue<Runnable>(10));
+                    new ArrayBlockingQueue<>(10));
 
     /**
      * 封装submit（）

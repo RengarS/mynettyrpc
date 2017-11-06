@@ -25,7 +25,6 @@ public class AriesRpc {
             ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.
                     SerializableObject(request, RpcRequest1.class));
             ChannelConst.clientChannel.writeAndFlush(byteBuf);
-            System.out.println("fasong ");
             String requestId = request.getRequestId();
             try {
                 for (; ; ) {
