@@ -6,14 +6,14 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * 启动类注解,Rpc服务端的地址和port
+ * Rpc服务端的地址和port,将初始化channel
  *
  * @author Aries
  * @date 2017-11-7
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface RpcServerAdd {
+public @interface RpcClient {
     String value();
 
     int port();
