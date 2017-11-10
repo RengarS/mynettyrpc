@@ -24,7 +24,7 @@ public class AriesRpc {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        });
+        }, 1);
     }
 
     /**
@@ -35,35 +35,33 @@ public class AriesRpc {
      * @throws Exception
      */
     public RpcResponse1 requestSync(final RpcRequest1 request) throws Exception {
+        ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest1.class));
+        String requestId = request.getRequestId();
+        rpcRequest1HashMap.put(requestId, request);
+        Channel channel = ChannelConst.channelBlockingQueue.take();
+        channel.writeAndFlush(byteBuf);
+        /**
+         * channel的数目是定值，因此不存在add操作阻塞。
+         */
+        ChannelConst.channelBlockingQueue.add(channel);
+        /**
+         * 此处虽然使用 synchronized 来修饰变量，但是变量是一个局部变量，线程私有的。
+         * 因此锁的状态仅仅是偏向锁，不存在竞争关系，不影响效率以及吞吐量。
+         * 仅作为线程调度。
+         */
+        synchronized (request) {
+            /**
+             * 发送完请求后线程即进入阻塞状态，直到收到响应并唤醒该线程。
+             */
+            request.wait();
+            try {
+                return ChannelConst.RESPONSE_MAP.remove(requestId);
 
-        Future future = ThreadPool.submit(() -> {
+            } finally {
+                rpcRequest1HashMap.remove(requestId);
+            }
+        }
 
-                    ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.
-                            SerializableObject(request, RpcRequest1.class));
-                    Channel channel = ChannelConst.channelBlockingDeque.take();
-                    channel.writeAndFlush(byteBuf);
-                    String requestId = request.getRequestId();
-                    System.out.println(requestId + "-----" + request);
-                    rpcRequest1HashMap.put(requestId, request);
-                    synchronized (request) {
-                        request.wait();
-                        try {
-                            RpcResponse1 response = ChannelConst.RESPONSE_MAP.get(requestId);
-                            if (response != null) {
-                                return response;
-                            }
-                        } finally {
-                            ChannelConst.RESPONSE_MAP.remove(requestId);
-                            rpcRequest1HashMap.remove(requestId);
-                            ChannelConst.channelBlockingDeque.put(channel);
-                        }
-                    }
-                    return null;
-                }
-
-        );
-        //return (RpcResponse1) future.get(3000, TimeUnit.MILLISECONDS);
-        return (RpcResponse1) future.get();
     }
 
     /**
@@ -77,26 +75,20 @@ public class AriesRpc {
         Future<RpcResponse1> future = ThreadPool.submit(() -> {
 
             ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest1.class));
-            Channel channel = ChannelConst.channelBlockingDeque.take();
+            Channel channel = ChannelConst.channelBlockingQueue.take();
             channel.writeAndFlush(byteBuf);
             String requestId = request.getRequestId();
             rpcRequest1HashMap.put(requestId, request);
             synchronized (request) {
                 request.wait();
                 try {
-                    RpcResponse1 response = ChannelConst.RESPONSE_MAP.get(requestId);
-                    if (response != null) {
-                        return response;
-                    }
+                    return ChannelConst.RESPONSE_MAP.remove(requestId);
 
                 } finally {
-                    int a;
-                    ChannelConst.RESPONSE_MAP.remove(requestId);
                     rpcRequest1HashMap.remove(requestId);
-                    ChannelConst.channelBlockingDeque.put(channel);
+                    ChannelConst.channelBlockingQueue.put(channel);
                 }
             }
-            return null;
         });
         return future;
     }

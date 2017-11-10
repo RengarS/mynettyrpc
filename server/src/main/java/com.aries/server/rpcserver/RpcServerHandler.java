@@ -26,9 +26,7 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        int a = integer.incrementAndGet();
-        System.out.println(a);
-        //TODO   根据id调用方法并得到返回值
+        Thread.sleep(5);
         ByteBuf byteBuf = ((ByteBuf) msg);
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);

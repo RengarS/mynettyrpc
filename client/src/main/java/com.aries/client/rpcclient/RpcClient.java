@@ -12,7 +12,7 @@ import io.netty.channel.socket.nio.NioSocketChannel;
  */
 public class RpcClient {
     public void connect(String host, int port) throws Exception {
-        EventLoopGroup group = new NioEventLoopGroup();
+        EventLoopGroup group = new NioEventLoopGroup(2);
         try {
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group)
@@ -27,7 +27,7 @@ public class RpcClient {
             ChannelFuture future = null;
             for (int i = 0; i < 10; i++) {
                 future = bootstrap.connect(host, port).sync();
-                ChannelConst.channelBlockingDeque.put(future.channel());
+                ChannelConst.channelBlockingQueue.put(future.channel());
             }
             future.channel().closeFuture().sync();
         } finally {

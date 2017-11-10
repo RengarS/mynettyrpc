@@ -8,9 +8,7 @@ public class ThreadPool {
     /**
      * 发送请求的线程池
      */
-    private static final ExecutorService EXECUTOR_SERVICE =
-            new ThreadPoolExecutor(5, 8, 20, TimeUnit.SECONDS,
-                    new ArrayBlockingQueue<>(10));
+    private static final ExecutorService EXECUTOR_SERVICE = Executors.newFixedThreadPool(6);
 
     /**
      * 封装submit（）
@@ -24,7 +22,7 @@ public class ThreadPool {
                 EXECUTOR_SERVICE.submit(callable);
     }
 
-    public static void submit(Runnable task) {
+    public static void submit(Runnable task, int a) {
         EXECUTOR_SERVICE.submit(task);
     }
 }
