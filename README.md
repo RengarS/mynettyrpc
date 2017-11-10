@@ -32,3 +32,9 @@
         
 下一步的优化：
         可以借鉴Jedis操作redis的思路创建一个链接池，实现半双工，方便匹配res 和req
+        
+2017-11-10：
+        重构了整个项目，拆分成client和server，可以单独构建。
+        修改了AriesRpc.java，使其可以作为一个单独的bean注入。
+        大量修改了client端的结果匹配逻辑。使用ReentrantLock和Condition来阻塞和唤醒线程。避免了自旋带来的性能损失。
+        使用了BlockingQueue来缓存Condition，避免创建过多Condition。（为了请求和结果的匹配，一个send和一个receive对应一个Condition。不做缓存             必然导致内存资源的浪费.）
