@@ -16,6 +16,8 @@ import java.util.concurrent.Future;
 public class AriesRpc {
     public static ConcurrentHashMap<String, RpcRequest1> rpcRequest1HashMap;
 
+    private static final byte[] DELIMITER = "_$$".getBytes();
+
     public AriesRpc() {
         rpcRequest1HashMap = new ConcurrentHashMap<>();
         ThreadPool.submit(() -> {
@@ -24,7 +26,7 @@ public class AriesRpc {
             } catch (Exception e) {
                 e.printStackTrace();
             }
-        }, 1);
+        });
     }
 
     /**
@@ -35,10 +37,14 @@ public class AriesRpc {
      * @throws Exception
      */
     public RpcResponse1 requestSync(final RpcRequest1 request) throws Exception {
-        ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest1.class));
+        // ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest1.class));
+
+        Channel channel = ChannelConst.channelBlockingQueue.take();
+        ByteBuf byteBuf = Unpooled.directBuffer();
+        byteBuf.writeBytes(SerializableUtils.SerializableObject(request, RpcRequest1.class));
+        byteBuf.writeBytes(DELIMITER);
         String requestId = request.getRequestId();
         rpcRequest1HashMap.put(requestId, request);
-        Channel channel = ChannelConst.channelBlockingQueue.take();
         channel.writeAndFlush(byteBuf);
         /**
          * channel的数目是定值，因此不存在add操作阻塞。

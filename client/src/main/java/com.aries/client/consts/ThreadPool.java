@@ -22,7 +22,7 @@ public class ThreadPool {
                 EXECUTOR_SERVICE.submit(callable);
     }
 
-    public static void submit(Runnable task, int a) {
+    public static void submit(Runnable task) {
         EXECUTOR_SERVICE.submit(task);
     }
 }

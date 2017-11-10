@@ -22,7 +22,7 @@ public class AriesRpcTest {
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }, 1);
+            });
         }
     }
 }

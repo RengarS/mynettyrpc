@@ -2,10 +2,12 @@ package com.aries.client.rpcclient;
 
 import com.aries.client.consts.ChannelConst;
 import io.netty.bootstrap.Bootstrap;
+import io.netty.buffer.Unpooled;
 import io.netty.channel.*;
 import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
+import io.netty.handler.codec.DelimiterBasedFrameDecoder;
 
 /**
  * @author Aries
@@ -21,7 +23,16 @@ public class RpcClient {
                     .handler(new ChannelInitializer<SocketChannel>() {
                         @Override
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
-                            socketChannel.pipeline().addLast(new RpcClientHandler());
+                            //处理tcp粘包
+                            socketChannel
+                                    .pipeline().
+                                    addLast(new DelimiterBasedFrameDecoder(10000,
+                                            Unpooled.copiedBuffer("_$$".getBytes()))
+                                    );
+
+                            socketChannel
+                                    .pipeline().
+                                    addLast(new RpcClientHandler());
                         }
                     });
             ChannelFuture future = null;
