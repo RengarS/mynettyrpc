@@ -33,11 +33,11 @@ public class RpcClientHandler extends ChannelInboundHandlerAdapter {
         RpcResponse response = SerializableUtils.UnSerializableObject(bytes, RpcResponse.class);
         this.map.put(response.getResponseId(), response);
         RpcRequest request1 = AriesRpc.rpcRequest1HashMap.get(response.getResponseId());
-        System.out.println(response.getResponseId() + "     responseID" + "    " + AriesRpc.rpcRequest1HashMap.size());
-        System.out.println(request1 + "+++++");
+        //System.out.println(response.getResponseId() + "     responseID" + "    " + AriesRpc.rpcRequest1HashMap.size());
+        //System.out.println(request1 + "+++++");
         synchronized (request1) {
             request1.notifyAll();
-            System.out.println("already notify");
+            // System.out.println("already notify");
         }
     }
 

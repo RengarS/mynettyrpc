@@ -11,28 +11,17 @@ public class IoCHelper {
 
     public IoCHelper() {
 
-        CLASS_SET
-                .stream()
-                .forEach(clz -> {
-                    Arrays
-                            .stream(clz.getDeclaredFields())
-                            .forEach(field -> {
-                                if (field.isAnnotationPresent(AutoWired.class)) {
-                                    try {
-                                        ReflectionUtil
-                                                .setField(
-                                                        BeanHelper
-                                                                .getBeanMap()
-                                                                .get(clz), field,
-                                                        BeanHelper
-                                                                .getBeanMap()
-                                                                .get(field.getClass())
-                                                );
-                                    } catch (IllegalAccessException e) {
-                                        e.printStackTrace();
-                                    }
-                                }
-                            });
-                });
+        CLASS_SET.stream().forEach(clz -> {
+            Arrays.stream(clz.getDeclaredFields()).forEach(field -> {
+                if (field.isAnnotationPresent(AutoWired.class)) {
+                    try {
+                        ReflectionUtil.setField(BeanHelper.getBeanMap().get(clz), field,
+                                BeanHelper.getBeanMap().get(field.getClass()));
+                    } catch (IllegalAccessException e) {
+                        e.printStackTrace();
+                    }
+                }
+            });
+        });
     }
 }

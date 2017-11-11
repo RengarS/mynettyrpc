@@ -46,7 +46,7 @@ public class BeanHelper {
             logger.info("IoC容器的Size：" + BEAN_MAP.size());
 
         }
-        System.out.println("bean map :" + BEAN_MAP.size());
+        //System.out.println("bean map :" + BEAN_MAP.size());
     }
 
     /**

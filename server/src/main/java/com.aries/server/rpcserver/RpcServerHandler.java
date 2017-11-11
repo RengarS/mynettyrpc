@@ -29,17 +29,17 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
      */
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        System.out.println("get");
+        //System.out.println("get");
         Thread.sleep(5);
         ByteBuf byteBuf = ((ByteBuf) msg);
         System.out.println(msg);
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
         RpcRequest request = SerializableUtils.UnSerializableObject(bytes, RpcRequest.class);
-        System.out.println("serviceId:  " + request.getServiceId());
+        //System.out.println("serviceId:  " + request.getServiceId());
         ByteBuf response = ctx.alloc().directBuffer();
         Object result = DispatcherUtil.invoke(request.getServiceId(), request.getRequestData());
-        System.out.println(result);
+        //System.out.println(result);
         response.writeBytes(SerializableUtils.SerializableObject(new RpcResponse(
                 request.getRequestId(), result), RpcResponse.class));
 
