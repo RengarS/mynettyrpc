@@ -1,6 +1,6 @@
 package com.aries.client.consts;
 
-import com.aries.client.domain.RpcResponse1;
+import com.aries.client.domain.RpcResponse;
 import io.netty.channel.Channel;
 
 import java.util.concurrent.*;
@@ -14,6 +14,6 @@ public class ChannelConst {
     /**
      * 存放来自server端的Response
      */
-    public static final ConcurrentHashMap<String, RpcResponse1> RESPONSE_MAP =
+    public static final ConcurrentHashMap<String, RpcResponse> RESPONSE_MAP =
             new ConcurrentHashMap<>();
 }

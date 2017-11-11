@@ -1,13 +1,15 @@
 package com.aries.server.domain;
 
-public class RpcResponse1 {
+public class RpcResponse {
     private String responseId;
-    private String responseData;
+    private Object responseData;
 
-    public RpcResponse1() {
+    private int statu;
+
+    public RpcResponse() {
     }
 
-    public RpcResponse1(String responseId, String responseData) {
+    public RpcResponse(String responseId, Object responseData) {
         this.responseId = responseId;
         this.responseData = responseData;
     }
@@ -20,11 +22,11 @@ public class RpcResponse1 {
         this.responseId = responseId;
     }
 
-    public String getResponseData() {
+    public Object getResponseData() {
         return responseData;
     }
 
-    public void setResponseData(String responseData) {
+    public void setResponseData(Object responseData) {
         this.responseData = responseData;
     }
 }

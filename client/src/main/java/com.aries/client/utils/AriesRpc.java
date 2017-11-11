@@ -3,8 +3,8 @@ package com.aries.client.utils;
 
 import com.aries.client.consts.ChannelConst;
 import com.aries.client.consts.ThreadPool;
-import com.aries.client.domain.RpcRequest1;
-import com.aries.client.domain.RpcResponse1;
+import com.aries.client.domain.RpcRequest;
+import com.aries.client.domain.RpcResponse;
 import com.aries.client.rpcclient.RpcClient;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -14,7 +14,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
 public class AriesRpc {
-    public static ConcurrentHashMap<String, RpcRequest1> rpcRequest1HashMap;
+    public static ConcurrentHashMap<String, RpcRequest> rpcRequest1HashMap;
 
     private static final byte[] DELIMITER = "_$$".getBytes();
 
@@ -36,12 +36,12 @@ public class AriesRpc {
      * @return
      * @throws Exception
      */
-    public RpcResponse1 requestSync(final RpcRequest1 request) throws Exception {
+    public RpcResponse requestSync(final RpcRequest request) throws Exception {
         // ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest1.class));
 
         Channel channel = ChannelConst.channelBlockingQueue.take();
         ByteBuf byteBuf = Unpooled.directBuffer();
-        byteBuf.writeBytes(SerializableUtils.SerializableObject(request, RpcRequest1.class));
+        byteBuf.writeBytes(SerializableUtils.SerializableObject(request, RpcRequest.class));
         byteBuf.writeBytes(DELIMITER);
         String requestId = request.getRequestId();
         rpcRequest1HashMap.put(requestId, request);
@@ -77,10 +77,10 @@ public class AriesRpc {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public Future<RpcResponse1> requestAsync(final RpcRequest1 request) {
-        Future<RpcResponse1> future = ThreadPool.submit(() -> {
+    public Future<RpcResponse> requestAsync(final RpcRequest request) {
+        Future<RpcResponse> future = ThreadPool.submit(() -> {
 
-            ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest1.class));
+            ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest.class));
             Channel channel = ChannelConst.channelBlockingQueue.take();
             channel.writeAndFlush(byteBuf);
             String requestId = request.getRequestId();

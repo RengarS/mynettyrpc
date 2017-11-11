@@ -1,9 +1,7 @@
 package com.aries.server.helper;
 
 
-import com.aries.server.annotation.Bean;
-import com.aries.server.annotation.Service;
-import com.aries.server.utils.ReflectionUtil;
+import com.aries.server.annotation.RpcService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,53 +24,30 @@ public class BeanHelper {
 
     public BeanHelper() {
         logger.info("BeanHelp已经启动");
-        Set<Class<?>> beanClassSet = ClassHelper.getClasseSet();
+        Set<Class<?>> beanClassSet = ClassHelper.getClassSet();
         for (Class<?> beanClass : beanClassSet) {
 
-            if (beanClass.isAnnotationPresent(Service.class)) {
+            Arrays.stream(beanClass.getAnnotations()).forEach(obj -> {
+                System.out.println(beanClass.getName() + "    " + obj.annotationType().getTypeName());
+            });
 
-                Object obj = ReflectionUtil.newInstance(beanClass);
-                BEAN_MAP.put(beanClass, obj);
-                logger.info(beanClass.getName() + "已经注入到容器");
-                //面向接口的支持
-                if (beanClass.getInterfaces().length != 0) {
-                    Arrays.
-                            stream(beanClass.getInterfaces()).
-                            parallel().
-                            forEach(
-                                    ImplInterface -> {
-                                        BEAN_MAP.put(
-                                                ImplInterface, ReflectionUtil.newInstance(beanClass)
-                                        );
-                                        logger.info(ImplInterface.getName() + "已经注入到容器");
-                                    }
-                            );
+            System.out.println(beanClass.getName());
+            if (beanClass.isAnnotationPresent(RpcService.class)) {
+                System.out.println(beanClass.getName() + "===========");
+                try {
+                    BEAN_MAP.put(beanClass, beanClass.newInstance());
+                } catch (InstantiationException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
                 }
-                //多态的支持
-                if (beanClass.getSuperclass() != null && beanClass.getSuperclass() != Object.class) {
-                    BEAN_MAP.put(beanClass.getSuperclass(), ReflectionUtil.newInstance(beanClass));
-                    logger.info(beanClass.getSuperclass().getName() + "已经注入到容器");
-                }
-                //@Bean注解的支持
-                Arrays.stream(beanClass.getDeclaredMethods()).
-                        parallel().
-                        filter(method -> method.isAnnotationPresent(Bean.class)).
-                        forEach(method -> {
-                            BEAN_MAP.put(
-                                    method.getReturnType(), ReflectionUtil.invokeMethod(
-                                            BEAN_MAP.get(beanClass), method
-                                    )
-                            );
-
-                            logger.info(beanClass.getName() + "." + method.getName() + "的返回值已经注入到容器（被@Bean注解）");
-                        });
-
             }
+
+            logger.info("IoC容器的Size：" + BEAN_MAP.size());
+
         }
-
-        logger.info("IoC容器的Size：" + BEAN_MAP.size());
+        System.out.println("bean map :" + BEAN_MAP.size());
     }
-
 
     /**
      * 获取Bean映射

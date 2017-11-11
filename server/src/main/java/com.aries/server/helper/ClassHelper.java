@@ -2,12 +2,10 @@ package com.aries.server.helper;
 
 
 import com.aries.server.AriesRpcFrameWork;
-import com.aries.server.annotation.Service;
 import com.aries.server.utils.ClassUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -24,30 +22,15 @@ public final class ClassHelper {
 
     public ClassHelper() {
         logger.info("ClassHelper已经启动");
-        String basePackage = AriesRpcFrameWork.getClassPath();
+        String basePackage = AriesRpcFrameWork.getPackageName();
         CLASS_SET = ClassUtil.getClassSet(basePackage);
+        System.out.println(CLASS_SET.size());
     }
 
     /**
      * 获取应用包名下所有类
      */
-    public static Set<Class<?>> getClasseSet() {
+    public static Set<Class<?>> getClassSet() {
         return CLASS_SET;
     }
-
-    /**
-     * 获取应用包下所有service类
-     *
-     * @return
-     */
-    public static Set<Class<?>> getServiceClassSet() {
-        Set<Class<?>> classSet = new HashSet<Class<?>>();
-        for (Class<?> cls : CLASS_SET) {
-            if (cls.isAnnotationPresent(Service.class)) {
-                classSet.add(cls);
-            }
-        }
-        return classSet;
-    }
-
 }

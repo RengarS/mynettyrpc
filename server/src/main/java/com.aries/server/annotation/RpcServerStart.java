@@ -13,6 +13,6 @@ import java.lang.annotation.Target;
  */
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.TYPE)
-public @interface RpcServer {
+public @interface RpcServerStart {
     int port();
 }

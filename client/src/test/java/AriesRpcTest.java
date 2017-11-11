@@ -1,7 +1,7 @@
 
 import com.aries.client.consts.ThreadPool;
-import com.aries.client.domain.RpcRequest1;
-import com.aries.client.domain.RpcResponse1;
+import com.aries.client.domain.RpcRequest;
+import com.aries.client.domain.RpcResponse;
 import com.aries.client.utils.AriesRpc;
 
 import java.util.UUID;
@@ -18,7 +18,7 @@ public class AriesRpcTest {
                 System.out.println(integer.getAndIncrement());
                 String content = UUID.randomUUID().toString();
                 try {
-                    RpcResponse1 response1 = ariesRpc.requestSync(new RpcRequest1(content, content));
+                    RpcResponse response1 = ariesRpc.requestSync(new RpcRequest(content, content, ""));
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
