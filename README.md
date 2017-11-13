@@ -37,7 +37,7 @@
 2017-11-10：</br>
         重构了整个项目，拆分成client和server，可以单独构建。</br>
         修改了AriesRpc.java，使其可以作为一个单独的bean注入。</br>
-        大量修改了client端的结果匹配逻辑。使用synchronized和notify()、wait()来阻塞和唤醒线程。避免了自旋带来的性能损失(虽然是使用synchronize，但         是由于锁的是局部变量，锁状态仅是轻量级锁，不影响吞吐量等)。</br>
+        大量修改了client端的结果匹配逻辑。使用synchronized和notify()、wait()来阻塞和唤醒线程。避免了自旋带来的性能损失(虽然是使用synchronized，但         是由于锁的是局部变量，锁状态仅是偏向锁，不影响吞吐量等)。</br>
         
         </br></br>
         
