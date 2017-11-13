@@ -4,7 +4,6 @@ package com.aries.client.rpcclient;
 import com.aries.client.consts.ChannelConst;
 import com.aries.client.domain.RpcRequest;
 import com.aries.client.domain.RpcResponse;
-import com.aries.client.utils.AriesRpc;
 import com.aries.client.utils.SerializableUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -17,7 +16,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author Aries
  */
 public class RpcClientHandler extends ChannelInboundHandlerAdapter {
-    private ConcurrentHashMap<String, RpcResponse> map = ChannelConst.RESPONSE_MAP;
+    private ConcurrentHashMap<String, Object> map = ChannelConst.RESPONSE_MAP;
 
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception {
@@ -26,18 +25,14 @@ public class RpcClientHandler extends ChannelInboundHandlerAdapter {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
-        //System.out.println("get");
         ByteBuf byteBuf = ((ByteBuf) msg);
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
         RpcResponse response = SerializableUtils.UnSerializableObject(bytes, RpcResponse.class);
+        RpcRequest request1 = (RpcRequest) this.map.get(response.getResponseId());
         this.map.put(response.getResponseId(), response);
-        RpcRequest request1 = AriesRpc.rpcRequest1HashMap.get(response.getResponseId());
-        //System.out.println(response.getResponseId() + "     responseID" + "    " + AriesRpc.rpcRequest1HashMap.size());
-        //System.out.println(request1 + "+++++");
         synchronized (request1) {
             request1.notifyAll();
-            // System.out.println("already notify");
         }
     }
 

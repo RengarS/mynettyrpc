@@ -1,7 +1,5 @@
 package com.aries.client.consts;
 
-import com.aries.client.domain.RpcResponse;
-
 import java.util.concurrent.*;
 
 public class ThreadPool {
@@ -16,7 +14,7 @@ public class ThreadPool {
      * @param callable
      * @return
      */
-    public static Future submit(Callable<RpcResponse> callable) {
+    public static <T> Future submit(Callable<T> callable) {
 
         return
                 EXECUTOR_SERVICE.submit(callable);

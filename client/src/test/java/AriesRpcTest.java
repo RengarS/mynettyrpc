@@ -10,7 +10,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 public class AriesRpcTest {
     public static void main(String[] args) throws Exception {
         AtomicInteger integer = new AtomicInteger(0);
-        AriesRpc ariesRpc = new AriesRpc();
+        AriesRpc ariesRpc = new AriesRpc("127.0.0.1", 8888);
         Thread.sleep(1000);
         for (int i = 0; i < 100; i++) {
 

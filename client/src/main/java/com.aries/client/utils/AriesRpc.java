@@ -10,19 +10,15 @@ import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
-import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.Future;
 
-public class AriesRpc {
-    public static ConcurrentHashMap<String, RpcRequest> rpcRequest1HashMap;
-
+public final class AriesRpc {
     private static final byte[] DELIMITER = "_$$".getBytes();
 
-    public AriesRpc() {
-        rpcRequest1HashMap = new ConcurrentHashMap<>();
+    public AriesRpc(String host, int port) {
         ThreadPool.submit(() -> {
             try {
-                new RpcClient().connect("127.0.0.1", 8888);
+                new RpcClient().connect(host, port);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -36,15 +32,15 @@ public class AriesRpc {
      * @return
      * @throws Exception
      */
-    public RpcResponse requestSync(final RpcRequest request) throws Exception {
-        // ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest1.class));
-
+    @SuppressWarnings("unchecked")
+    public <T> T requestSync(final RpcRequest request) throws Exception {
         Channel channel = ChannelConst.channelBlockingQueue.take();
         ByteBuf byteBuf = Unpooled.directBuffer();
         byteBuf.writeBytes(SerializableUtils.SerializableObject(request, RpcRequest.class));
+        //向ByteBuf末尾添加分隔符，防止粘包
         byteBuf.writeBytes(DELIMITER);
         String requestId = request.getRequestId();
-        rpcRequest1HashMap.put(requestId, request);
+        ChannelConst.RESPONSE_MAP.put(requestId, request);
         channel.writeAndFlush(byteBuf);
         /**
          * channel的数目是定值，因此不存在add操作阻塞。
@@ -60,12 +56,9 @@ public class AriesRpc {
              * 发送完请求后线程即进入阻塞状态，直到收到响应并唤醒该线程。
              */
             request.wait();
-            try {
-                return ChannelConst.RESPONSE_MAP.remove(requestId);
 
-            } finally {
-                rpcRequest1HashMap.remove(requestId);
-            }
+            return (T) ((RpcResponse) ChannelConst.RESPONSE_MAP.remove(requestId)).getResponseData();
+
         }
 
     }
@@ -77,23 +70,33 @@ public class AriesRpc {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public Future<RpcResponse> requestAsync(final RpcRequest request) {
-        Future<RpcResponse> future = ThreadPool.submit(() -> {
-
+    public <T> Future<T> requestAsync(final RpcRequest request) {
+        Future<T> future = ThreadPool.submit(() -> {
+            /**
+             * 将RpcResponse序列化成byte[],并转成ByteBuf对象
+             */
             ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest.class));
+            /**
+             * 从存放有channel的阻塞队列中取到一个channel
+             */
             Channel channel = ChannelConst.channelBlockingQueue.take();
+            /**
+             * 将RpcRequest发送出去
+             */
             channel.writeAndFlush(byteBuf);
+            /**
+             * 将channel返回给阻塞队列
+             */
+            ChannelConst.channelBlockingQueue.add(channel);
             String requestId = request.getRequestId();
-            rpcRequest1HashMap.put(requestId, request);
+            /**
+             * 将requestId和request放进map中
+             */
+            ChannelConst.RESPONSE_MAP.put(requestId, request);
             synchronized (request) {
                 request.wait();
-                try {
-                    return ChannelConst.RESPONSE_MAP.remove(requestId);
+                return (T) ((RpcResponse) ChannelConst.RESPONSE_MAP.remove(requestId)).getResponseData();
 
-                } finally {
-                    rpcRequest1HashMap.remove(requestId);
-                    ChannelConst.channelBlockingQueue.put(channel);
-                }
             }
         });
         return future;
