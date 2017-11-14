@@ -12,6 +12,8 @@ public class ChannelConst {
      * 使用阻塞队列存储多个channel是因为NIO模型中一个线程可以绑定多个channel。如果只使用一个channel，server端只会有一个线程去处理
      * request请求，其他线程处于空置状态。无法发挥多核cpu的优势。而如果我使用多个channel，channel就可能会绑定多个线程，届时将会有
      * 多个线程去处理request。
+     *
+     * @see com.aries.client.utils.AriesRpc
      */
     public static BlockingQueue<Channel> channelBlockingQueue = new LinkedBlockingQueue<>(20);
     /**
