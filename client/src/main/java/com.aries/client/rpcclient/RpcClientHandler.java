@@ -26,13 +26,19 @@ public class RpcClientHandler extends ChannelInboundHandlerAdapter {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) throws Exception {
         ByteBuf byteBuf = ((ByteBuf) msg);
+        //新建一个数组，用于读取msg的内容
         byte[] bytes = new byte[byteBuf.readableBytes()];
+        //读取byteBuf的内容
         byteBuf.readBytes(bytes);
+        //将byte[]反序列化成响应体
         RpcResponse response = SerializableUtils.UnSerializableObject(bytes, RpcResponse.class);
+        //根据id从map中获取request
         RpcRequest request1 = (RpcRequest) this.map.get(response.getResponseId());
+        //将response放入map中
         this.map.put(response.getResponseId(), response);
+        //唤醒之前阻塞的线程
         synchronized (request1) {
-            request1.notifyAll();
+            request1.notify();
         }
     }
 

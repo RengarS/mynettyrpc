@@ -22,8 +22,6 @@ public class ServiceHelper {
                 }
             });
         });
-
-        //System.out.println(handlerHashMap.size() + "-----------------");
     }
 
     public static Handler getHandler(String key) {

@@ -1,17 +1,17 @@
 package com.aries.client.domain;
 
 public class RpcRequest {
-    /**
-     * 请求id
-     */
-    private String requestId;
+        /**
+         * 请求id
+         */
+        private String requestId;
 
-    private String serviceId;
+        private String serviceId;
 
-    /**
-     * 请求体
-     */
-    private Object requestData;
+        /**
+         * 请求体
+         */
+        private Object requestData;
 
     public RpcRequest() {
     }

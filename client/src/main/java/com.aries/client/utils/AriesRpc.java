@@ -34,31 +34,24 @@ public final class AriesRpc {
      */
     @SuppressWarnings("unchecked")
     public <T> T requestSync(final RpcRequest request) throws Exception {
+        //从阻塞队列中取出一个channel
         Channel channel = ChannelConst.channelBlockingQueue.take();
+        //申请一个ByteBuf
         ByteBuf byteBuf = Unpooled.directBuffer();
+        //将请求体序列化并写入到ByteBuf中
         byteBuf.writeBytes(SerializableUtils.SerializableObject(request, RpcRequest.class));
         //向ByteBuf末尾添加分隔符，防止粘包
         byteBuf.writeBytes(DELIMITER);
         String requestId = request.getRequestId();
+        //将id和request放进一个map中
         ChannelConst.RESPONSE_MAP.put(requestId, request);
+        //将请求发送到服务端
         channel.writeAndFlush(byteBuf);
-        /**
-         * channel的数目是定值，因此不存在add操作阻塞。
-         */
+        // channel的数目是定值，因此不存在add操作阻塞。
         ChannelConst.channelBlockingQueue.add(channel);
-        /**
-         * 此处虽然使用 synchronized 来修饰变量，但是变量是一个局部变量，线程私有的。
-         * 因此锁的状态仅仅是偏向锁，不存在竞争关系，不影响效率以及吞吐量。
-         * 仅作为线程调度。
-         */
         synchronized (request) {
-            /**
-             * 发送完请求后线程即进入阻塞状态，直到收到响应并唤醒该线程。
-             */
             request.wait();
-
             return (T) ((RpcResponse) ChannelConst.RESPONSE_MAP.remove(requestId)).getResponseData();
-
         }
 
     }

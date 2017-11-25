@@ -4,7 +4,6 @@ public class RpcResponse {
     private String responseId;
     private Object responseData;
 
-    private int statu;
 
     public RpcResponse() {
     }

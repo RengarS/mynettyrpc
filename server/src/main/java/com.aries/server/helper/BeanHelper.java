@@ -26,19 +26,13 @@ public class BeanHelper {
         logger.info("BeanHelp已经启动");
         Set<Class<?>> beanClassSet = ClassHelper.getClassSet();
         for (Class<?> beanClass : beanClassSet) {
-
-            Arrays.stream(beanClass.getAnnotations()).forEach(obj -> {
-                System.out.println(beanClass.getName() + "    " + obj.annotationType().getTypeName());
-            });
-
-            System.out.println(beanClass.getName());
+            //遍历CLASS_SET,如果某个类被@RpcService注解，把它和它的一个实例放入BEAN_MAP中
             if (beanClass.isAnnotationPresent(RpcService.class)) {
-                System.out.println(beanClass.getName() + "===========");
                 try {
                     BEAN_MAP.put(beanClass, beanClass.newInstance());
-                } catch (InstantiationException e) {
-                    e.printStackTrace();
                 } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InstantiationException e) {
                     e.printStackTrace();
                 }
             }
@@ -46,7 +40,6 @@ public class BeanHelper {
             logger.info("IoC容器的Size：" + BEAN_MAP.size());
 
         }
-        //System.out.println("bean map :" + BEAN_MAP.size());
     }
 
     /**
