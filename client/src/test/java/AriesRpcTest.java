@@ -1,12 +1,9 @@
 
 import com.aries.client.consts.ThreadPool;
-import com.aries.client.domain.RpcRequest;
-import com.aries.client.domain.RpcResponse;
 import com.aries.client.utils.AriesRpc;
 
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class AriesRpcTest {
     public static void main(String[] args) throws Exception {

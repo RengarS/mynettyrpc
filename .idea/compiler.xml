@@ -7,12 +7,19 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="client" />
+        <module name="commons" />
+        <module name="register-client" />
+        <module name="register-server" />
         <module name="server" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel target="1.8">
       <module name="client" target="1.8" />
+      <module name="commons" target="1.8" />
       <module name="mynettyrpc" target="1.8" />
+      <module name="register-client" target="1.8" />
+      <module name="register-server" target="1.8" />
+      <module name="registerserver" target="1.8" />
       <module name="server" target="1.8" />
     </bytecodeTargetLevel>
   </component>

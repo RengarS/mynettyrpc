@@ -3,6 +3,7 @@ package com.aries.server.helper;
 
 import com.aries.server.AriesRpcFrameWork;
 import com.aries.server.utils.ClassUtil;
+import lombok.Data;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

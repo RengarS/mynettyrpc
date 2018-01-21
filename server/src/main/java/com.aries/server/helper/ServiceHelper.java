@@ -2,11 +2,13 @@ package com.aries.server.helper;
 
 import com.aries.server.annotation.ServiceId;
 import com.aries.server.domain.Handler;
+import lombok.Data;
 
 import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Set;
+
 
 public class ServiceHelper {
     private static HashMap<String, Handler> handlerHashMap = new HashMap<>();

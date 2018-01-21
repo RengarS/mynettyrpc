@@ -20,18 +20,18 @@ public @interface ServiceId {
      * @return
      */
     String value();
-
-    /**
-     * 请求体的Class类型
-     *
-     * @return
-     */
-    Class<?> requestClass();
-
-    /**
-     * 返回体的Class类型
-     *
-     * @return
-     */
-    Class<?> responseClass();
+//
+//    /**
+//     * 请求体的Class类型
+//     *
+//     * @return
+//     */
+//    Class<?> requestClass();
+//
+//    /**
+//     * 返回体的Class类型
+//     *
+//     * @return
+//     */
+//    Class<?> responseClass();
 }

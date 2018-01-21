@@ -3,10 +3,11 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/client/client.iml" filepath="$PROJECT_DIR$/client/client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/commons/commons.iml" filepath="$PROJECT_DIR$/commons/commons.iml" />
       <module fileurl="file://$PROJECT_DIR$/mynettyrpc.iml" filepath="$PROJECT_DIR$/mynettyrpc.iml" />
+      <module fileurl="file://$PROJECT_DIR$/register-client/register-client.iml" filepath="$PROJECT_DIR$/register-client/register-client.iml" />
+      <module fileurl="file://$PROJECT_DIR$/register-server/register-server.iml" filepath="$PROJECT_DIR$/register-server/register-server.iml" />
       <module fileurl="file://$PROJECT_DIR$/server/server.iml" filepath="$PROJECT_DIR$/server/server.iml" />
-      <module fileurl="file://$PROJECT_DIR$/service-register/service-register.iml" filepath="$PROJECT_DIR$/service-register/service-register.iml" />
-      <module fileurl="file://$PROJECT_DIR$/service-register-cli/service-register-cli.iml" filepath="$PROJECT_DIR$/service-register-cli/service-register-cli.iml" />
     </modules>
   </component>
 </project>

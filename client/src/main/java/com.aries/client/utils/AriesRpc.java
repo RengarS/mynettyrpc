@@ -3,9 +3,8 @@ package com.aries.client.utils;
 
 import com.aries.client.consts.ChannelConst;
 import com.aries.client.consts.ThreadPool;
-import com.aries.client.domain.RpcRequest;
-import com.aries.client.domain.RpcResponse;
 import com.aries.client.rpcclient.RpcClient;
+import com.aries.commons.utils.SerializableUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
