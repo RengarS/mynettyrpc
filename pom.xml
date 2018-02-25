@@ -22,7 +22,6 @@
             <artifactId>netty-all</artifactId>
             <version>4.0.24.Final</version>
         </dependency>
-
         <!-- Protostuff -->
         <dependency>
             <groupId>com.dyuproject.protostuff</groupId>
