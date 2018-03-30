@@ -1,5 +1,7 @@
 package com.aries.server.rpcserver;
 
+import com.aries.commons.domains.ObjectDataRequest;
+import com.aries.commons.domains.ObjectDataResponse;
 import com.aries.commons.utils.SerializableUtils;
 import com.aries.server.utils.DispatcherUtil;
 import io.netty.buffer.ByteBuf;
@@ -28,11 +30,11 @@ public class RpcServerHandler extends ChannelInboundHandlerAdapter {
         ByteBuf byteBuf = ((ByteBuf) msg);
         byte[] bytes = new byte[byteBuf.readableBytes()];
         byteBuf.readBytes(bytes);
-        RpcRequest request = SerializableUtils.UnSerializableObject(bytes, RpcRequest.class);
+        ObjectDataRequest request = SerializableUtils.UnSerializableObject(bytes, ObjectDataRequest.class);
         ByteBuf response = ctx.alloc().directBuffer();
-        Object result = DispatcherUtil.invoke(request.getServiceId(), request.getRequestData());
-        response.writeBytes(SerializableUtils.SerializableObject(new RpcResponse(
-                request.getRequestId(), result), RpcResponse.class));
+        Object result = DispatcherUtil.invoke(request.getServiceId(), request.getData());
+        response.writeBytes(SerializableUtils.SerializableObject(new ObjectDataResponse<>(
+                request.getRequestId(), result), ObjectDataResponse.class));
 
         response.writeBytes(DELIMITER);
         ctx.writeAndFlush(response);

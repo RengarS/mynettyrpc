@@ -38,6 +38,7 @@ public class RegisterServerBoot {
                         }
                     });
             ChannelFuture future = bootstrap.bind(port).sync();
+            System.out.println("===============");
             future.channel().closeFuture().sync();
         } catch (Exception e) {
             e.printStackTrace();
@@ -58,4 +59,9 @@ public class RegisterServerBoot {
             new RegisterServerBoot().start(ariesRpcDiscovery.port());
         }
     }
+
+    public static void main(String[] args) {
+        new RegisterServerBoot().start(9999);
+    }
+
 }

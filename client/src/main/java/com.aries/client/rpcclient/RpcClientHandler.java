@@ -2,6 +2,8 @@ package com.aries.client.rpcclient;
 
 
 import com.aries.client.consts.ChannelConst;
+import com.aries.commons.domains.ObjectDataRequest;
+import com.aries.commons.domains.ObjectDataResponse;
 import com.aries.commons.utils.SerializableUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.channel.ChannelHandlerContext;
@@ -29,9 +31,9 @@ public class RpcClientHandler extends ChannelInboundHandlerAdapter {
         //读取byteBuf的内容
         byteBuf.readBytes(bytes);
         //将byte[]反序列化成响应体
-        RpcResponse response = SerializableUtils.UnSerializableObject(bytes, RpcResponse.class);
+        ObjectDataResponse response = SerializableUtils.UnSerializableObject(bytes, ObjectDataRequest.class);
         //根据id从map中获取request
-        RpcRequest request1 = (RpcRequest) this.map.get(response.getResponseId());
+        ObjectDataRequest request1 = (ObjectDataRequest) this.map.get(response.getResponseId());
         //将response放入map中
         this.map.put(response.getResponseId(), response);
         //唤醒之前阻塞的线程

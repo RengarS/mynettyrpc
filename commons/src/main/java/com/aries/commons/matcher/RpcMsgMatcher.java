@@ -16,13 +16,16 @@ import java.util.concurrent.*;
 public class RpcMsgMatcher {
     private static Map<String, Object> objectMap = new ConcurrentHashMap<>();
     private static ExecutorService service = Executors.newFixedThreadPool(2);
+    private static final byte[] DELIMITER = "_$$".getBytes();
 
     @SuppressWarnings("unchecked")
     public static <T> T requestSync(final ObjectDataRequest request, Channel channel, T resType) {
         byte[] msgBytes = SerializableUtils.SerializableObject(request, request.getClass());
         ByteBuf byteBuf = Unpooled.copiedBuffer(msgBytes);
+        byteBuf.writeBytes(DELIMITER);
         objectMap.put(request.getRequestId(), request);
         channel.writeAndFlush(byteBuf);
+
         synchronized (request) {
             if (objectMap.get(request.getRequestId()) == null) {
 
@@ -40,7 +43,9 @@ public class RpcMsgMatcher {
     @SuppressWarnings("unchecked")
     public static Future requestAsync(final ObjectDataRequest request, Channel channel) {
         byte[] bytes = SerializableUtils.SerializableObject(request, request.getClass());
-        ByteBuf byteBuf = Unpooled.copiedBuffer(bytes);
+        ByteBuf byteBuf = Unpooled.directBuffer();
+        byteBuf.writeBytes(bytes);
+        byteBuf.writeBytes(DELIMITER);
         objectMap.put(request.getRequestId(), request);
         channel.writeAndFlush(byteBuf);
 

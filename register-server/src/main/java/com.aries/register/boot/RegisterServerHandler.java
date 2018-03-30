@@ -9,6 +9,7 @@ import com.aries.commons.consts.ServiceConst;
 import com.aries.register.util.ServiceUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
+import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
@@ -20,7 +21,7 @@ public class RegisterServerHandler extends SimpleChannelInboundHandler {
         msg.writeBytes(content);
         //byte数组反序列化成对象
         ObjectDataRequest request = SerializableUtils.UnSerializableObject(content, ObjectDataRequest.class);
-        ObjectDataResponse response = dispatch(request);
+        ObjectDataResponse response = dispatch(request, channelHandlerContext.channel());
         if (null != response) {
             byte[] bytes = SerializableUtils.SerializableObject(response, ObjectDataResponse.class);
             ByteBuf byteBuf = Unpooled.copiedBuffer(bytes);
@@ -35,7 +36,7 @@ public class RegisterServerHandler extends SimpleChannelInboundHandler {
      * @return
      */
     @SuppressWarnings("unchecked")
-    private static ObjectDataResponse dispatch(ObjectDataRequest request) {
+    private static ObjectDataResponse dispatch(ObjectDataRequest request, Channel channel) {
         ObjectDataResponse objectDataResponse = null;
         if (request.getServiceId().equals(ServiceConst.DO_CHECK)) {
             //检查service
@@ -44,7 +45,7 @@ public class RegisterServerHandler extends SimpleChannelInboundHandler {
         } else if (request.getServiceId().equals(ServiceConst.DO_REGISTER)) {
             //注册
             RegisterData data = (RegisterData) request.getData();
-            ServiceUtil.register(data.getServiceName(), data.getUrl());
+            ServiceUtil.register(data.getServiceName(), data.getUrl(), channel);
         } else if (request.getServiceId().equals(ServiceConst.GET_SERVICE)) {
             //获取service
             objectDataResponse = new ObjectDataResponse<String>(null, null);

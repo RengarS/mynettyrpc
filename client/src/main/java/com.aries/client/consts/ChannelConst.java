@@ -2,6 +2,7 @@ package com.aries.client.consts;
 
 import io.netty.channel.Channel;
 
+import java.util.Map;
 import java.util.concurrent.*;
 
 /**
@@ -9,13 +10,9 @@ import java.util.concurrent.*;
  */
 public class ChannelConst {
     /**
-     * 使用阻塞队列存储多个channel是因为NIO模型中一个线程可以绑定多个channel。如果只使用一个channel，server端只会有一个线程去处理
-     * request请求，其他线程处于空置状态。无法发挥多核cpu的优势。而如果我使用多个channel，channel就可能会绑定多个线程，届时将会有
-     * 多个线程去处理request。
-     *
-     * @see com.aries.client.utils.AriesRpc
+     * 存放各个channel
      */
-    public static BlockingQueue<Channel> channelBlockingQueue = new LinkedBlockingQueue<>(20);
+    public static Map<String, Channel> ADDRESS_CHANNEL_MAP = new ConcurrentHashMap<>();
     /**
      * 存放来自server端的Response和client端的request。当用户发送请求的时候，将调用request.wait()阻塞线程，同时requestId和request
      * 会存在此容器中。当客户端接收到服务端的response的时候，会调用map.get(id)得到request对象，并调用map.put(id,response)将服务

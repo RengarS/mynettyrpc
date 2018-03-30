@@ -26,7 +26,7 @@ public class ServiceUtil {
      * @param ipAddress
      * @return
      */
-    public static boolean register(String serviceName, String ipAddress) {
+    public static boolean register(String serviceName, String ipAddress, Channel channel) {
         ConcurrentHashMap<String, List<String>> container = RegisterContainer.getServiceContainer();
         if (container.get(serviceName) == null) {
             List<String> ipAddresses = new LinkedList<>();
@@ -37,6 +37,7 @@ public class ServiceUtil {
             ipAdds.add(ipAddress);
             container.putIfAbsent(serviceName, ipAdds);
         }
+        map.put(ipAddress, channel);
         return true;
     }
 
@@ -89,7 +90,7 @@ public class ServiceUtil {
             if (serviceIps.size() == 1) {
                 serviceIp = serviceIps.get(0);
             } else {
-                int index = new Random().nextInt(serviceIps.size());
+                int index = random.nextInt(serviceIps.size() - 1);
                 serviceIp = serviceIps.get(index);
             }
         }

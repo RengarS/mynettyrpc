@@ -8,12 +8,27 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
+import lombok.Data;
 
 /**
  * @author Aries
  */
+@Data
 public class RpcClient {
-    public void connect(String host, int port) throws Exception {
+    private String host;
+    private int port;
+
+    public static Channel channel;
+
+    public RpcClient(String host, int port) {
+        this.host = host;
+        this.port = port;
+    }
+
+    public RpcClient() {
+    }
+
+    public static void connect(String host, int port) throws Exception {
         EventLoopGroup group = new NioEventLoopGroup(2);
         try {
             Bootstrap bootstrap = new Bootstrap();
@@ -25,8 +40,8 @@ public class RpcClient {
                         protected void initChannel(SocketChannel socketChannel) throws Exception {
                             //处理tcp粘包
                             socketChannel
-                                    .pipeline().
-                                    addLast(new DelimiterBasedFrameDecoder(10000,
+                                    .pipeline()
+                                    .addLast(new DelimiterBasedFrameDecoder(10000,
                                             Unpooled.copiedBuffer("_$$".getBytes()))
                                     );
 
@@ -35,19 +50,13 @@ public class RpcClient {
                                     addLast(new RpcClientHandler());
                         }
                     });
-            ChannelFuture future = null;
-            for (int i = 0; i < 10; i++) {
-                future = bootstrap.connect(host, port).sync();
-                ChannelConst.channelBlockingQueue.put(future.channel());
-            }
-            future.channel().closeFuture().sync();
+            ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
+            channel = channelFuture.channel();
+            ChannelConst.ADDRESS_CHANNEL_MAP.put(host + ":" + port, channelFuture.channel());
+            channelFuture.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully();
         }
     }
 
-    public static void main(String[] args) throws Exception {
-        final RpcClient client = new RpcClient();
-        client.connect("127.0.0.1", 8888);
-    }
 }

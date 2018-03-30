@@ -4,6 +4,8 @@ package com.aries.client.utils;
 import com.aries.client.consts.ChannelConst;
 import com.aries.client.consts.ThreadPool;
 import com.aries.client.rpcclient.RpcClient;
+import com.aries.commons.domains.ObjectDataRequest;
+import com.aries.commons.domains.ObjectDataResponse;
 import com.aries.commons.utils.SerializableUtils;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
@@ -32,13 +34,13 @@ public final class AriesRpc {
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public <T> T requestSync(final RpcRequest request) throws Exception {
+    public <T> T requestSync(final ObjectDataRequest request) throws Exception {
         //从阻塞队列中取出一个channel
-        Channel channel = ChannelConst.channelBlockingQueue.take();
+        Channel channel = RpcClient.channel;
         //申请一个ByteBuf
         ByteBuf byteBuf = Unpooled.directBuffer();
         //将请求体序列化并写入到ByteBuf中
-        byteBuf.writeBytes(SerializableUtils.SerializableObject(request, RpcRequest.class));
+        byteBuf.writeBytes(SerializableUtils.SerializableObject(request, ObjectDataRequest.class));
         //向ByteBuf末尾添加分隔符，防止粘包
         byteBuf.writeBytes(DELIMITER);
         String requestId = request.getRequestId();
@@ -46,11 +48,11 @@ public final class AriesRpc {
         ChannelConst.RESPONSE_MAP.put(requestId, request);
         //将请求发送到服务端
         channel.writeAndFlush(byteBuf);
-        // channel的数目是定值，因此不存在add操作阻塞。
-        ChannelConst.channelBlockingQueue.add(channel);
+//        // channel的数目是定值，因此不存在add操作阻塞。
+//        ChannelConst.channelBlockingQueue.add(channel);
         synchronized (request) {
             request.wait();
-            return (T) ((RpcResponse) ChannelConst.RESPONSE_MAP.remove(requestId)).getResponseData();
+            return (T) ((ObjectDataResponse) ChannelConst.RESPONSE_MAP.remove(requestId)).getData();
         }
 
     }
@@ -62,24 +64,25 @@ public final class AriesRpc {
      * @return
      */
     @SuppressWarnings("unchecked")
-    public <T> Future<T> requestAsync(final RpcRequest request) {
+    public <T> Future<T> requestAsync(final ObjectDataRequest request) {
         Future<T> future = ThreadPool.submit(() -> {
             /**
              * 将RpcResponse序列化成byte[],并转成ByteBuf对象
              */
-            ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, RpcRequest.class));
+            ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, ObjectDataRequest.class));
             /**
              * 从存放有channel的阻塞队列中取到一个channel
              */
-            Channel channel = ChannelConst.channelBlockingQueue.take();
+//            Channel channel = ChannelConst.channelBlockingQueue.take();
+            Channel channel = RpcClient.channel;
             /**
              * 将RpcRequest发送出去
              */
             channel.writeAndFlush(byteBuf);
-            /**
-             * 将channel返回给阻塞队列
-             */
-            ChannelConst.channelBlockingQueue.add(channel);
+//            /**
+//             * 将channel返回给阻塞队列
+//             */
+//            ChannelConst.channelBlockingQueue.add(channel);
             String requestId = request.getRequestId();
             /**
              * 将requestId和request放进map中
@@ -87,7 +90,7 @@ public final class AriesRpc {
             ChannelConst.RESPONSE_MAP.put(requestId, request);
             synchronized (request) {
                 request.wait();
-                return (T) ((RpcResponse) ChannelConst.RESPONSE_MAP.remove(requestId)).getResponseData();
+                return (T) ((ObjectDataResponse) ChannelConst.RESPONSE_MAP.remove(requestId)).getData();
 
             }
         });

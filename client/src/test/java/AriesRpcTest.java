@@ -1,6 +1,7 @@
 
 import com.aries.client.consts.ThreadPool;
 import com.aries.client.utils.AriesRpc;
+import com.aries.commons.domains.ObjectDataRequest;
 
 import java.util.UUID;
 import java.util.concurrent.CountDownLatch;
@@ -19,7 +20,7 @@ public class AriesRpcTest {
             ThreadPool.submit(() -> {
                 String content = UUID.randomUUID().toString();
                 try {
-                    String response = ariesRpc.requestSync(new RpcRequest(content, content, "getPerson"));
+                    String response = ariesRpc.requestSync(new ObjectDataRequest(content, content, "getPerson"));
                     latch.countDown();
                 } catch (Exception e) {
                     e.printStackTrace();

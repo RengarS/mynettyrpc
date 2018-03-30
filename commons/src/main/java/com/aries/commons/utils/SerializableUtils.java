@@ -1,5 +1,7 @@
 package com.aries.commons.utils;
 
+import com.aries.commons.domains.ObjectDataRequest;
+import com.aries.commons.domains.ObjectDataResponse;
 import com.dyuproject.protostuff.LinkedBuffer;
 import com.dyuproject.protostuff.ProtobufIOUtil;
 import com.dyuproject.protostuff.runtime.RuntimeSchema;
@@ -13,8 +15,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @author aries
  */
 public class SerializableUtils {
-    private static final RuntimeSchema<Object> REQUEST_RUNTIME_SCHEMA = RuntimeSchema.createFrom(Object.class);
-    private static final RuntimeSchema<Object> RESPONSE_RUNTIME_SCHEMA = RuntimeSchema.createFrom(Object.class);
+    private static final RuntimeSchema<ObjectDataRequest> REQUEST_RUNTIME_SCHEMA = RuntimeSchema.createFrom(ObjectDataRequest.class);
+    private static final RuntimeSchema<ObjectDataResponse> RESPONSE_RUNTIME_SCHEMA = RuntimeSchema.createFrom(ObjectDataResponse.class);
 
     private static ConcurrentHashMap<Class, RuntimeSchema> SCHEMA_MAP;
 
@@ -37,11 +39,11 @@ public class SerializableUtils {
      */
     public static <T> T UnSerializableObject(byte[] bytes, Class<?> clz) {
         if (clz == Object.class) {
-            Object request = REQUEST_RUNTIME_SCHEMA.newMessage();
+            ObjectDataRequest request = REQUEST_RUNTIME_SCHEMA.newMessage();
             ProtobufIOUtil.mergeFrom(bytes, request, REQUEST_RUNTIME_SCHEMA);
             return (T) request;
         } else if (clz == Object.class) {
-            Object response = RESPONSE_RUNTIME_SCHEMA.newMessage();
+            ObjectDataResponse response = RESPONSE_RUNTIME_SCHEMA.newMessage();
             ProtobufIOUtil.mergeFrom(bytes, response, RESPONSE_RUNTIME_SCHEMA);
             return (T) response;
         }
@@ -56,9 +58,9 @@ public class SerializableUtils {
      */
     public static <T> byte[] SerializableObject(T toBeSerial, Class<?> clz) {
         RuntimeSchema runtimeSchema = null;
-        if (clz == Object.class) {
+        if (clz == ObjectDataRequest.class) {
             runtimeSchema = REQUEST_RUNTIME_SCHEMA;
-        } else if (clz == Object.class) {
+        } else if (clz == ObjectDataResponse.class) {
             runtimeSchema = RESPONSE_RUNTIME_SCHEMA;
         }
         byte[] bytes = ProtobufIOUtil.toByteArray(toBeSerial, runtimeSchema, LinkedBuffer.allocate(LinkedBuffer
