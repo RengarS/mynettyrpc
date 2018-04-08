@@ -1,7 +1,9 @@
 package com.aries.server.helper;
 
 
+import com.aries.server.annotation.Repository;
 import com.aries.server.annotation.RpcService;
+import com.aries.server.utils.MybatisImplGenUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,6 +36,9 @@ public class BeanHelper {
                 } catch (InstantiationException e) {
                     e.printStackTrace();
                 }
+            } else if (beanClass.isAnnotationPresent(Repository.class)) {
+                //将cglib生成的mybatis repository proxy注入进IOC容器
+                BEAN_MAP.put(beanClass, MybatisImplGenUtil.getDAOImpl(beanClass));
             }
 
             logger.info("IoC容器的Size：" + BEAN_MAP.size());

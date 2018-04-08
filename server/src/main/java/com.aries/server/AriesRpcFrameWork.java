@@ -3,11 +3,8 @@ package com.aries.server;
 
 import com.aries.server.annotation.BasePackage;
 import com.aries.server.annotation.RpcServerStart;
+import com.aries.server.helper.*;
 import com.aries.server.rpcserver.RpcServer;
-import com.aries.server.helper.BeanHelper;
-import com.aries.server.helper.ClassHelper;
-import com.aries.server.helper.IoCHelper;
-import com.aries.server.helper.ServiceHelper;
 
 public class AriesRpcFrameWork {
 
@@ -30,6 +27,7 @@ public class AriesRpcFrameWork {
 
         new ClassHelper();
         new BeanHelper();
+        new InitMybatisSqlSessionFactoryHelper();
         new IoCHelper();
         new ServiceHelper();
         new Thread(() ->

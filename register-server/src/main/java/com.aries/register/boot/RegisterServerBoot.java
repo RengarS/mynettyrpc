@@ -18,6 +18,9 @@ import io.netty.handler.codec.DelimiterBasedFrameDecoder;
  * 启动项
  */
 public class RegisterServerBoot {
+
+    public static final byte[] DELIMITER = "_$$".getBytes();
+
     private void start(int port) {
         EventLoopGroup boss = new NioEventLoopGroup();
         EventLoopGroup worker = new NioEventLoopGroup();

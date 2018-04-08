@@ -6,11 +6,15 @@ import com.aries.client.consts.ThreadPool;
 import com.aries.client.rpcclient.RpcClient;
 import com.aries.commons.domains.ObjectDataRequest;
 import com.aries.commons.domains.ObjectDataResponse;
+import com.aries.commons.utils.IDGenerator;
 import com.aries.commons.utils.SerializableUtils;
+import com.aries.disserver.consts.ServiceURLChannelConst;
+import com.aries.disserver.utils.RegisterClientUtil;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 
+import java.util.HashMap;
 import java.util.concurrent.Future;
 
 public final class AriesRpc {
@@ -29,14 +33,16 @@ public final class AriesRpc {
     /**
      * 发送同步请求，最多阻塞三秒
      *
-     * @param request
+     * @param
      * @return
      * @throws Exception
      */
     @SuppressWarnings("unchecked")
-    public <T> T requestSync(final ObjectDataRequest request) throws Exception {
+    public <T> T requestSync(String serviceName, String serviceId, T data) throws Exception {
+        ObjectDataRequest<T> request = new ObjectDataRequest(IDGenerator.getRandomId(), serviceId, data);
+        Channel channel = getServiceChannel(serviceName);
         //从阻塞队列中取出一个channel
-        Channel channel = RpcClient.channel;
+//        Channel channel = RpcClient.channel;
         //申请一个ByteBuf
         ByteBuf byteBuf = Unpooled.directBuffer();
         //将请求体序列化并写入到ByteBuf中
@@ -48,8 +54,6 @@ public final class AriesRpc {
         ChannelConst.RESPONSE_MAP.put(requestId, request);
         //将请求发送到服务端
         channel.writeAndFlush(byteBuf);
-//        // channel的数目是定值，因此不存在add操作阻塞。
-//        ChannelConst.channelBlockingQueue.add(channel);
         synchronized (request) {
             request.wait();
             return (T) ((ObjectDataResponse) ChannelConst.RESPONSE_MAP.remove(requestId)).getData();
@@ -60,29 +64,28 @@ public final class AriesRpc {
     /**
      * 发送异步请求，只返回一个future对象
      *
-     * @param request
+     * @param serviceName
+     * @param serviceId
+     * @param data
+     * @param <T>
+     * @param <B>
      * @return
      */
     @SuppressWarnings("unchecked")
-    public <T> Future<T> requestAsync(final ObjectDataRequest request) {
+    public <T, B> Future<T> requestAsync(String serviceName, String serviceId, B data) {
+
+        ObjectDataRequest<B> request = new ObjectDataRequest(IDGenerator.getRandomId(), serviceId, data);
+
+        Channel channel = getServiceChannel(serviceName);
         Future<T> future = ThreadPool.submit(() -> {
             /**
              * 将RpcResponse序列化成byte[],并转成ByteBuf对象
              */
             ByteBuf byteBuf = Unpooled.copiedBuffer(SerializableUtils.SerializableObject(request, ObjectDataRequest.class));
             /**
-             * 从存放有channel的阻塞队列中取到一个channel
-             */
-//            Channel channel = ChannelConst.channelBlockingQueue.take();
-            Channel channel = RpcClient.channel;
-            /**
              * 将RpcRequest发送出去
              */
             channel.writeAndFlush(byteBuf);
-//            /**
-//             * 将channel返回给阻塞队列
-//             */
-//            ChannelConst.channelBlockingQueue.add(channel);
             String requestId = request.getRequestId();
             /**
              * 将requestId和request放进map中
@@ -95,5 +98,26 @@ public final class AriesRpc {
             }
         });
         return future;
+    }
+
+    /**
+     * 根据serviceName从注册中心获取serviceUrl，再连接到service host，获取channel并返回
+     *
+     * @param serviceName
+     * @return
+     */
+    private static Channel getServiceChannel(String serviceName) {
+        String serviceUrl = RegisterClientUtil.getServiceUrl(serviceName);
+        Channel channel = ServiceURLChannelConst.getServiceAddChannelMap().get(serviceUrl);
+
+        if (channel == null) {
+            RegisterClientUtil.connectServiceHost(serviceUrl);
+        }
+
+        channel = ServiceURLChannelConst.getServiceAddChannelMap().get(serviceUrl);
+        if (channel == null) {
+            throw new RuntimeException("service host " + serviceName + "不存在！");
+        }
+        return channel;
     }
 }

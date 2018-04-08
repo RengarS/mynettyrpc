@@ -18,13 +18,18 @@ public class RegisterServerHandler extends SimpleChannelInboundHandler {
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
         ByteBuf msg = (ByteBuf) o;
         byte[] content = new byte[msg.readableBytes()];
-        msg.writeBytes(content);
+        msg.readBytes(content);
         //byte数组反序列化成对象
         ObjectDataRequest request = SerializableUtils.UnSerializableObject(content, ObjectDataRequest.class);
+
+//        System.out.println(((RegisterData) request.getData()).getServiceName() + "    " + ((RegisterData) request.getData()).getUrl());
+
         ObjectDataResponse response = dispatch(request, channelHandlerContext.channel());
         if (null != response) {
             byte[] bytes = SerializableUtils.SerializableObject(response, ObjectDataResponse.class);
-            ByteBuf byteBuf = Unpooled.copiedBuffer(bytes);
+            ByteBuf byteBuf = Unpooled.directBuffer();
+            byteBuf.writeBytes(bytes);
+            byteBuf.writeBytes(RegisterServerBoot.DELIMITER);
             channelHandlerContext.writeAndFlush(byteBuf);
         }
     }
@@ -41,16 +46,18 @@ public class RegisterServerHandler extends SimpleChannelInboundHandler {
         if (request.getServiceId().equals(ServiceConst.DO_CHECK)) {
             //检查service
             RpcMsgMatcher.getObjectMap().put(request.getRequestId(), request);
-
         } else if (request.getServiceId().equals(ServiceConst.DO_REGISTER)) {
             //注册
             RegisterData data = (RegisterData) request.getData();
+
+            System.out.println(data.getServiceName() + "  " + data.getUrl());
             ServiceUtil.register(data.getServiceName(), data.getUrl(), channel);
         } else if (request.getServiceId().equals(ServiceConst.GET_SERVICE)) {
             //获取service
             objectDataResponse = new ObjectDataResponse<String>(null, null);
             objectDataResponse.setResponseId(request.getRequestId());
             objectDataResponse.setData(ServiceUtil.getServiceIpByName((String) request.getData()));
+            System.out.println("get service did !");
         }
 
         return objectDataResponse;

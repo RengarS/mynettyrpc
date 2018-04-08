@@ -1,4 +1,4 @@
-package com.aries.client.rpcclient;
+package com.aries.disserver.utils;
 
 import com.aries.disserver.consts.ServiceURLChannelConst;
 import io.netty.bootstrap.Bootstrap;
@@ -8,28 +8,24 @@ import io.netty.channel.nio.NioEventLoopGroup;
 import io.netty.channel.socket.SocketChannel;
 import io.netty.channel.socket.nio.NioSocketChannel;
 import io.netty.handler.codec.DelimiterBasedFrameDecoder;
-import lombok.Data;
 
-/**
- * @author Aries
- */
-@Data
-public class RpcClient {
-    private String host;
-    private int port;
+public class RegisterClientBoot {
 
-    public static Channel channel;
+//    public static Channel channel = null;
 
-    public RpcClient(String host, int port) {
-        this.host = host;
-        this.port = port;
-    }
+    private static EventLoopGroup group = new NioEventLoopGroup(5);
 
-    public RpcClient() {
-    }
-
+    /**
+     * 连接到注册中心
+     *
+     * @param host
+     * @param port
+     * @throws Exception
+     */
     public static void connect(String host, int port) throws Exception {
-        EventLoopGroup group = new NioEventLoopGroup(2);
+        //EventLoopGroup group = new NioEventLoopGroup(2);
+
+        RegisterClientUtil.setRegisterServerHost(host + ":" + port);
         try {
             Bootstrap bootstrap = new Bootstrap();
             bootstrap.group(group)
@@ -47,16 +43,15 @@ public class RpcClient {
 
                             socketChannel
                                     .pipeline().
-                                    addLast(new RpcClientHandler());
+                                    addLast(new RegisterClientHandler());
                         }
                     });
             ChannelFuture channelFuture = bootstrap.connect(host, port).sync();
-            channel = channelFuture.channel();
+//            channel = channelFuture.channel();
             ServiceURLChannelConst.getServiceAddChannelMap().put(host + ":" + port, channelFuture.channel());
             channelFuture.channel().closeFuture().sync();
         } finally {
             group.shutdownGracefully();
         }
     }
-
 }

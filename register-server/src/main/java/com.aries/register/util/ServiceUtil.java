@@ -99,4 +99,14 @@ public class ServiceUtil {
     }
 
 
+    public static void requestSync() {
+    }
+
+    public void requestAsync() {
+    }
+
+    public void connectService() {
+    }
+
+
 }

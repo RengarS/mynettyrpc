@@ -38,11 +38,11 @@ public class SerializableUtils {
      * @return 反序列化后的对象
      */
     public static <T> T UnSerializableObject(byte[] bytes, Class<?> clz) {
-        if (clz == Object.class) {
+        if (clz == ObjectDataRequest.class) {
             ObjectDataRequest request = REQUEST_RUNTIME_SCHEMA.newMessage();
             ProtobufIOUtil.mergeFrom(bytes, request, REQUEST_RUNTIME_SCHEMA);
             return (T) request;
-        } else if (clz == Object.class) {
+        } else if (clz == ObjectDataResponse.class) {
             ObjectDataResponse response = RESPONSE_RUNTIME_SCHEMA.newMessage();
             ProtobufIOUtil.mergeFrom(bytes, response, RESPONSE_RUNTIME_SCHEMA);
             return (T) response;
