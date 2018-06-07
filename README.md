@@ -51,12 +51,7 @@
         好几天没commit了，这段时间有点松懈了
  
  
- 
-1.类似Spring、Spring MVC的web框架。具有Aop和IoC功能         (Done，待重构)
-2.基于Netty的分布式Web框架，包括Client和Server端。           (Done，待重构)
-3.基于Netty的服务发现治理中心，包括Client和Server端。         (Doing...)
-4.类似Spring Session的分布式框架的Session一致化解决方案。     (TODO)
-5.基于Hash算法的分布式Redis解决方案。                        (TODO)
+
 
 
 模块说明：
