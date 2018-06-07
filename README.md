@@ -57,3 +57,10 @@
 3.基于Netty的服务发现治理中心，包括Client和Server端。         (Doing...)
 4.类似Spring Session的分布式框架的Session一致化解决方案。     (TODO)
 5.基于Hash算法的分布式Redis解决方案。                        (TODO)
+
+
+模块说明：
+    client是RPC 的客户端，用于服务消费者和生产者的通信
+    registerclient 提供RPC服务消费者注册到注册中心的功能
+    registerserver 注册中心，同时提供负载均衡功能（随机算法）
+    server rpc消费者服务容器

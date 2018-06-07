@@ -13,6 +13,8 @@ import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.SimpleChannelInboundHandler;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public class RegisterServerHandler extends SimpleChannelInboundHandler {
     @Override
     protected void channelRead0(ChannelHandlerContext channelHandlerContext, Object o) throws Exception {
@@ -61,5 +63,6 @@ public class RegisterServerHandler extends SimpleChannelInboundHandler {
         }
 
         return objectDataResponse;
+        ReentrantLock
     }
 }
