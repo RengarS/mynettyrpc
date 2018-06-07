@@ -64,3 +64,7 @@
     registerclient 提供RPC服务消费者注册到注册中心的功能
     registerserver 注册中心，同时提供负载均衡功能（随机算法）
     server rpc消费者服务容器
+    
+阅读源码指引：
+    阅读client模块最好先阅读 com.aries.client.utils.AriesRpc.java
+    阅读server模块最好先阅读 com.aries.server.AriesRpcFramework.java
